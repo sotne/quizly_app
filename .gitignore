@@ -1,2 +1,7 @@
 node_modules
 .env
+
+
+#Ignore local vs code settings
+.vscode
+
