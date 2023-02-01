@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
             }
             `
 
-            const { data } = await axios.post(process.nextTick.GRAPHQL_ENDPOINT,
+            const { data } = await axios.post(process.env.GRAPHQL_ENDPOINT,
                 {
                     query:mutation,
                     variables:{
