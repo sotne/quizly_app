@@ -3,42 +3,53 @@ dotenv.config();
 const express = require('express');
 const app = express();
 const port = 3000;
-const path= require('path')
-const {connectDB} = require('./src/db');
-const { graphqlHTTP } = require('express-graphql'); 
+const path = require('path');
+const { connectDB } = require('./src/db');
+const { graphqlHTTP } = require('express-graphql');
 const schema = require('./src/graphql/schema');
+const { authenticate } = require('./src/middleware/auth');
+const cookieParser = require('cookie-parser');
 
-//execute the connectdb function to connect to our database
+
+// Execute the connectDB function to connect to our database
 connectDB();
 
-//add graphql middleware to app
+// Basic Middleware
+const myLogger = function(req, res, next){
+    console.log(req.path);
+    next()
+}
+
+app.use(myLogger);
+
+// Add Cookie Parser middleware BEFORE the authenticate
+app.use(cookieParser());
+
+// Add authentication midddleware to the app
+app.use(authenticate);
+
+// Add graphql middleware to app
 app.use('/graphql', graphqlHTTP({
     schema,
-    graphiql: true,
-
+    graphiql: true
 }))
 
-app.set('view engine', 'ejs')
-//update the location of the folder for res.rendre to use
+app.set('view engine', 'ejs');
+// Update the location of the folder for res.render to use
 app.set('views', path.join(__dirname, 'src/templates/views'))
 
-//set up  middleware to parse form data and add to request body
-app.use(express.urlencoded({extended:true}))
-
-
+// Set up middleware to parse form data and add to request body
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-    res.send('hello world');
+    res.send('Hello World');
 });
 
-//import the function from the routes module
-const initroutes = require('./src/routes');
-//execute the function with app as arguement
-initroutes(app);
-
+// Import the function from routes module
+const initRoutes = require('./src/routes');
+// Execute the function with app as argument
+initRoutes(app);
 
 app.listen(port, () => {
-    console.log(`server is listening on port ${port}`);
+    console.log(`Server is listening on port ${port}`);
 });
-
-

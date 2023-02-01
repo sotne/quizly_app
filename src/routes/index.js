@@ -1,4 +1,3 @@
-module.exports= function(app){
+module.exports = function(app){
     app.use('/auth', require('./auth'))
 }
-
