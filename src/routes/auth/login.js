@@ -1,6 +1,5 @@
 const axios = require('axios');
 
-
 module.exports = async (req, res) => {
     try{
         const mutation = `
@@ -10,30 +9,29 @@ module.exports = async (req, res) => {
                     password: $password
                 )
             }
-    
         `
         const { data } = await axios.post(process.env.GRAPHQL_ENDPOINT,
-            {
-                query: mutation,
-                variables: {
-                    email: req.body.email,
-                    username: req.body.username,
-                    password: req.body.password,
+                {
+                    query: mutation,
+                    variables: {
+                        email: req.body.email,
+                        password: req.body.password
+                    }
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
                 }
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }
-        )
+            )
 
         const jwtToken = data.data.login;
-
-        res.cookie('jwtToken', jwtToken, {httponly: true});
+                console.log(jwtToken)
+        res.cookie('jwtToken', jwtToken, { httpOnly: true });
 
         res.redirect('/');
-    }catch(err){
+
+    } catch(err) {
         console.log(err);
         res.redirect('/auth/login')
     }

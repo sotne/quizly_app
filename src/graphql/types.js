@@ -1,5 +1,8 @@
 // Import built-in graphql types
 const { GraphQLObjectType, GraphQLID, GraphQLString } = require('graphql');
+//import the user model
+const { User } = require('../models');
+
 
 
 const UserType = new GraphQLObjectType(
@@ -14,7 +17,28 @@ const UserType = new GraphQLObjectType(
     }
 )
 
+const QuizType = new GraphQLObjectType(
+    {
+        name: 'Quiz',
+        description: 'Quiz Type',
+        fields: () => ({
+            id: {type: GraphQLID},
+            slug: {type: GraphQLString},
+            title: {type: GraphQLString},
+            description: {type: GraphQLString},
+            userId: {type: GraphQLID},
+            user: {
+                type: UserType,
+                resolve(parents, args){
+                    return User.findById(parent.userId)
+                }
+            }
+        })
+    }
+)
+
 
 module.exports = {
-    UserType
+    UserType,
+    QuizType
 }

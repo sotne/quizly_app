@@ -1,5 +1,5 @@
-module.exports = (req, res) => { 
-    //clear the jwt token
-    res.cookie('jwtToken', '', {httponly:true});
-    res.cookie()
+module.exports = (req, res) => {
+    // Clear the jwtToken
+    res.cookie('jwtToken', '', { httpOnly: true });
+    res.redirect('/auth/login');
 }
