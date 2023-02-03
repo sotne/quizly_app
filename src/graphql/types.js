@@ -1,8 +1,7 @@
 // Import built-in graphql types
-const { GraphQLObjectType, GraphQLInputObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLList } = require('graphql');
-//import the user model
+const { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLInputObjectType, GraphQLList } = require('graphql');
+// Import the User Model
 const { User, Quiz, Question } = require('../models');
-
 
 
 const UserType = new GraphQLObjectType(
@@ -15,8 +14,8 @@ const UserType = new GraphQLObjectType(
             email: { type: GraphQLString },
             quizzes: {
                 type: new GraphQLList(QuizType),
-                resolve(parent,args){
-                    return Quiz.find({ userId: parent.id })
+                resolve(parent, args){
+                    return Quiz.find( { userId: parent.id })
                 }
             }
         })
@@ -29,57 +28,58 @@ const QuizType = new GraphQLObjectType(
         name: 'Quiz',
         description: 'Quiz Type',
         fields: () => ({
-            id: {type: GraphQLID},
-            slug: {type: GraphQLString},
-            title: {type: GraphQLString},
-            description: {type: GraphQLString},
-            userId: {type: GraphQLID},
+            id: { type: GraphQLID },
+            slug: { type: GraphQLString },
+            title: { type: GraphQLString },
+            description: { type: GraphQLString },
+            userId: { type: GraphQLID },
             user: {
                 type: UserType,
-                resolve(parents, args){
+                resolve(parent, args){
                     return User.findById(parent.userId)
+                }
+            },
+            questions: {
+                type: new GraphQLList(QuestionType),
+                resolve(parent, args){
+                    return Question.find( { quizId: parent.id })
                 }
             }
         })
     }
 )
 
-//create a question type for queries
+// Create a Question Type (INPUT) for mutation of creating a quiz
+const QuestionInputType = new GraphQLInputObjectType(
+    {
+        name: 'QuestionInput',
+        description: 'Question Input Type',
+        fields: () => ({
+            title: { type: GraphQLString },
+            order: { type: GraphQLInt },
+            correctAnswer: { type: GraphQLString }
+        })
+    }
+)
+
+
+// Create a Question Type for queries
 const QuestionType = new GraphQLObjectType(
     {
         name: 'Question',
         description: 'Question Type',
         fields: () => ({
-            id: {type: GraphQLID},
-            title: {type: GraphQLString},
-            correctAnswer: {type: GraphQLString},
-            order: { type: GraphQLInt},
-            quizId: {type: GraphQLID},
+            id: { type: GraphQLID },
+            title: { type: GraphQLString },
+            correctAnswer: { type: GraphQLString },
+            order: { type: GraphQLInt },
+            quizId: { type: GraphQLID },
             quiz: {
-                type:QuizType,
+                type: QuizType,
                 resolve(parent, args){
                     return Quiz.findById(parent.quizId)
                 }
-            },
-            questions: {
-                type: GraphQLList(QuestionType),
-                resolve(parent, args){
-                    return Question.find({ quizId: parent.id})
-                }
             }
-        })
-    }
-)
-
-//create a question type (input) for mutation of creating a quiz
-const QuestionInputType = new GraphQLInputObjectType(
-    {
-        name:'Question',
-        description:'Question input type',
-        fields: () => ({
-            title:{GraphQLString},
-            correctAnswer: {GraphQLInt},
-            order:{GraphQLString},
         })
     }
 )
@@ -88,5 +88,5 @@ const QuestionInputType = new GraphQLInputObjectType(
 module.exports = {
     UserType,
     QuizType,
-    QuestionInputType
+    QuestionInputType,
 }
